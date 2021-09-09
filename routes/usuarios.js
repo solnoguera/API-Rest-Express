@@ -8,13 +8,13 @@ const { checkRole, checkExistingEmail, checkExistingID } = require('../helpers/d
 const { usuariosGet,
         usuariosPut, 
         usuariosPost, 
-        usuariosPatch, 
         usuariosDelete } = require('../controllers/usuarios');
 
 
 const router = Router();
 
 router.get('/', usuariosGet );
+
 //Para el routh param, express te lo da en una variable.
 //Esto significa que es obligatorio ponerlo. La ruta sin el id ya no existe.
 router.put('/:id', [
@@ -37,9 +37,12 @@ router.post('/', [
     validarCampos //Nuestro middleware que controla los checkeos
 ] ,usuariosPost );
 
-router.patch('/', usuariosPatch );
 
-router.delete('/', usuariosDelete);
+router.delete('/:id', [
+    check('id','No es un ID de la base de datos').isMongoId(),
+    check('id').custom( checkExistingID ),
+    validarCampos
+] ,usuariosDelete);
 
 
 module.exports = router;

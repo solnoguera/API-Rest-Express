@@ -7,7 +7,7 @@ const bcryptjs = require('bcryptjs');
 
 //May para crear instancias de mi modelo
 const Usuario = require('../models/usuario');
-const { checkExistingEmail } = require('../helpers/db-validators');
+
 
 const usuariosGet = async(req = request, res = response ) => {
     
@@ -39,20 +39,14 @@ const usuariosPost = async (req = request, res = response ) => {
     //Por lo tanto mongoose los ignora por mi.
     const usuario = new Usuario({name, email, password, role});
 
-    await checkExistingEmail(email)
-
     //Encriptar la contraseña o hacer el hash
     const salt = bcryptjs.genSaltSync();
     usuario.password = bcryptjs.hashSync(password, salt);
 
-
     //Guardar en DB
     await usuario.save();
     //Limpieza, asegurar que no vengan scripts o inyecciones.
-    res.status(201).json({
-        'msg': 'post API - Controller',
-        usuario
-    });
+    res.status(201).json(usuario);
 }
 
 
@@ -60,7 +54,6 @@ const usuariosPut = async(req = request, res = response ) => {
 
     const {id} = req.params;
     const {password, google, _id, role, email, ...resto} = req.body
-    //TODO validar contra base de datos el id
     if(password){
         //Encriptar contraseña
         const salt = bcryptjs.genSaltSync();
@@ -71,16 +64,13 @@ const usuariosPut = async(req = request, res = response ) => {
 }
 
 
-const usuariosPatch = (req = request, res = response ) => {
-    res.json({
-        'msg': 'patch API - Controller'
-    });
-}
-
-const usuariosDelete = (req = request, res = response ) => {
-    res.json({
-        'msg': 'delete API - Controller'
-    });
+const usuariosDelete = async(req = request, res = response ) => {
+    
+    const {id} = req.params;
+    //Borramos fisicamente : No recomendado
+    //const usuario = await Usuario.findByIdAndDelete(id);
+    const usuario = await Usuario.findByIdAndUpdate(id, {status : false});
+    res.json(usuario);
 }
 
 
@@ -89,6 +79,5 @@ module.exports = {
     usuariosGet,
     usuariosPut,
     usuariosPost,
-    usuariosPatch,
     usuariosDelete
 }
