@@ -1,10 +1,10 @@
-import { connect } from 'mongoose';
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 const dbConnection = async() => {
     try{
         //Devuelve una promesa, el objeto necesario para mandar
-        await connect(process.env.MONGODB_CNN, {
+        await mongoose.connect(process.env.MONGODB_CNN, {
             useNewUrlParser : true,
             useUnifiedTopology : true,
             useCreateIndex : true,
@@ -21,6 +21,6 @@ const dbConnection = async() => {
 }
 
 
-export default {
+module.exports = {
     dbConnection
 }
